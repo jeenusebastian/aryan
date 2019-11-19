@@ -1,50 +1,98 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<unistd.h>
-void main(){
-    int n;
-    printf("\n Enter value of n:");
-    
-    scanf("%d",&n);
-    int primes[n];
-    int non_primes[n];
-    int sp=0,np=0;
-    for(int i=2;i<=n;i++){
-        int f=0;
-        for(int j=2;j<=i/2;j++){
-                if(i%j==0){
-                        f=1;
-                        break;
-                 }
-          }
-          if(f==1)
-                non_primes[np++]=i;
-          else
-                primes[sp++]=i;
+#include<string.h>
+char a[20],action[10],input[20],stk[20];
+int i,j,k,n,z;
+void check();
+
+int main(){
+
+  printf("\ngrammer is \nE->E+E\nE->E*E\nE->(E)\nE->id\n");    // Production
+  printf("Input string :\n");
+  scanf("%s",a);
+  printf("you have entred the string %s\n",a);
+  n = strlen(a);
+  printf("\n%s\n",input);
+  //printf("%d\n",n);
+ // printf("STACK\tINPUT\t\tACTION\t\n");
+  strcpy(input,a);
+
+  for(i=0,j=0,k=0;input[i]!='\0';i++,j++,k++){
+    if(input[i] == 'i' && input[i+1] == 'd'){
+      stk[j] = input[i];
+      stk[j+1] = input[i+1];
+      //stk[j+2] = '\0';
+      input[i] = ' ';
+      input[i+1] = ' ';
+      //printf("$%s\t%s$\tShift->id\n",stk,input);
+      check();
+     
     }
-    
-    int pid=fork();
-    if(pid<0){
-            fprintf(stderr,"fork failed");
-           }
-  else if (pid==0){
-            int sum=0;
-            for(int i=0;i<sp;i++)
-                    sum+=primes[i];
-                    
-            printf("\n sum of primes %d",sum);
-                    
-   }
-   else if(pid>0){
- 
-              int sum2=0;
-            for(int i=0;i<np;i++)
-                    sum2+=non_primes[i];
-                    
-              printf("\n sum of non primes %d",sum2);
-   }
-   else;
-    /*  for(int i=0;i<np;i++){
-            printf("%d",non_primes[i]);
-           }*/
- }
+    else {
+      if(input[i] == '+' ||input[i] == '*' ||input[i] == '(' ||input[i] == ')'){
+      stk[j] = input[i];
+      //printf(" input here is %c\n",input[i]);
+      input[i] = ' ';
+      stk[j+1] = ' ';
+      if(stk[j] == ')'){
+        check();
+      }
+     // printf("$%s\t%s$\tShift->%c\n",stk,input,stk[j]);
+      }
+    }
+  }
+  //printf("Elements in stack are %s",stk);
+  if(!strcmp(stk,"E\0"))
+{
+//printf("\nAccepted");
+
+}
+  else
+//printf("\nNot Accepted");
+  return 0;
+}
+
+
+void check(){
+  int flag=1;
+  if(flag=1){
+  for(z=0;z<n;z++){
+    flag=0;
+    if(stk[z] == 'i' && stk[z+1] == 'd'){
+      //reducing id to E
+      flag=1;
+      stk[z] = 'E';
+      stk[z+1] = ' ';
+    //  printf("$%s\t%s$\tReduce to E by E->id\n",stk,input);
+      j--;
+    }
+    if(stk[z] == 'E' && stk[z+1] == '+' && stk[z+2] == 'E'){
+      //production E->E+E
+      flag=1;
+      stk[z] = 'E';
+      stk[z+1] = ' ';
+      stk[z+2] = ' ';
+     // printf("$%s\t%s$\tReduce to E by E->E+E\n",stk,input);
+      i=i-2;
+    }
+    if(stk[z] == 'E' && stk[z+1] == '*' && stk[z+2] == 'E'){
+      //production E->E*E
+      flag=1;
+      stk[z] = 'E';
+      stk[z+1] = ' ';
+      stk[z+2] = ' ';
+     // printf("$%s\t%s$\tReduce to E by E->E*E\n",stk,input);
+      i=i-2;
+    }
+    if(stk[z] == '(' && stk[z+1] == 'E' && stk[z+2] == ')'){
+      //production E->(E)
+      flag=1;
+      stk[z] = 'E';
+      stk[z+1] = ' ';
+      stk[z+2] = ' ';
+     // printf("$%s\t%s$\tReduce to E by E->(E)\n",stk,input);
+      i=i-2;
+    }
+  }
+}
+}
